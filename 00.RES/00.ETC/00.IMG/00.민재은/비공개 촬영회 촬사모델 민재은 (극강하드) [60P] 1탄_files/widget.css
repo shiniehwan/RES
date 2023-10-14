@@ -1,0 +1,7 @@
+@charset "utf-8";
+
+.miso-keyword { line-height:22px; height:22px; overflow:hidden; text-align:center; white-space:no-wrap; }
+.miso-keyword > a { display:inline-block; letter-spacing:-1px; padding-right:12px; }
+.miso-keyword > a::after { float:right; color:#ddd; content: "|"; margin-right:-10px;  }
+.miso-keyword > a:last-child { padding-right:0px; }
+.miso-keyword > a:last-child::after { content: ""; margin-right:0px; }
