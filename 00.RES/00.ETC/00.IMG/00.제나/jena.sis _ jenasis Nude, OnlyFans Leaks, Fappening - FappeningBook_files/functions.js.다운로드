@@ -1,0 +1,31 @@
+$(document).ready(function(){
+
+            	
+   	$('.open-menu-dv').click(
+		function() {
+            $('.menu-dv').slideToggle();
+            $('.open-menu-dv').toggleClass('active');
+            	});
+            	
+   	$('.open-search-dv').click(
+		function() {
+            $('.search-dv').slideToggle();
+            $('.open-search-dv').toggleClass('active');
+            	});
+            	
+   	$('.model-bio-text-open-dv').click(
+		function() {
+            $('.model-bio-text-dv').css('max-height','100%');
+            $('.model-bio-text-open-dv').hide();
+            $('.model-bio-text-close-dv').show();
+            	});
+            	
+   	$('.model-bio-text-close-dv').click(
+		function() {
+            $('.model-bio-text-dv').css('max-height','96px');
+            $('.model-bio-text-close-dv').hide();
+            $('.model-bio-text-open-dv').show();
+            	});
+
+ 
+});

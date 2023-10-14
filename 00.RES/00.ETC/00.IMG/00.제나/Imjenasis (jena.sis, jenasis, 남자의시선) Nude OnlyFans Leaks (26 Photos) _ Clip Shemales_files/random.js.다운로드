@@ -1,0 +1,33 @@
+// How to Display Random News or Content with JavaScript
+// Created by Extreme Design Studio
+
+// View full tutorial and code explanation here:      http://www.extremestudio.ro/blog/?p=4273
+
+randomNumber = Math.floor(Math.random()*4+1);
+
+window.onload = function() {
+	if (randomNumber == 1) {
+		document.getElementById("news1").style.display = "inline"; 
+		document.getElementById("news2").style.display = "none"; 
+		document.getElementById("news3").style.display = "none"; 
+		document.getElementById("news4").style.display = "none"; 
+	}	
+	if (randomNumber == 2) {
+		document.getElementById("news1").style.display = "none"; 
+		document.getElementById("news2").style.display = "inline"; 
+		document.getElementById("news3").style.display = "none"; 
+		document.getElementById("news4").style.display = "none"; 
+	}
+	if (randomNumber == 3) {
+		document.getElementById("news1").style.display = "none"; 
+		document.getElementById("news2").style.display = "none"; 
+		document.getElementById("news3").style.display = "inline"; 
+		document.getElementById("news4").style.display = "none"; 
+	}
+	if (randomNumber == 4) {
+		document.getElementById("news1").style.display = "none"; 
+		document.getElementById("news2").style.display = "none"; 
+		document.getElementById("news3").style.display = "none"; 
+		document.getElementById("news4").style.display = "inline"; 
+	}
+}
