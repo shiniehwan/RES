@@ -1,0 +1,32 @@
+m.addEvent("onInit",function(minitalk,channel,user) {
+	minitalk.printMessage("plugin","[구글검색플러그인] 채팅창에 !구글 검색어를 쳐보세요. 구글검색결과를 알려드립니다.");
+});
+
+m.addEvent("onSendMessage",function(minitalk,message,user) {
+	if (message.indexOf("!구글 ") == 0) {
+		(function() {
+			var page = 1;
+			var keyword = message.replace(/^!구글 /,"");
+			var url = "http://api.arzz.com/google/";
+			var apiURL = url+'?callback=?';
+			$.getJSON(apiURL,{
+				keyword:keyword,
+				page:"1",
+				listnum:"10",
+				rnd:Math.random()
+			}).done(function(data) {
+				if (data.error) {
+					m.printSystem("plugin","[구글검색플러그인] 검색결과를 받아오지 못하였습니다.");
+				} else {
+					for (var i=0, loop=data.results.length;i<loop;i++) {
+						var message = data.results[i]["title"]+"([COLOR=0465D2]"+data.results[i]["url"]+"[/COLOR]) [I][COLOR=666666]"+data.results[i]["content"].substr(0,40)+"...[/COLOR][/I]";
+						message = message.replace(/<b>/g,"").replace(/<\/b>/g,"");
+						message = message.replace(/<(.*?)>/g,"");
+						m.sendMessage(message,true);
+						if (i == 5) break;
+					}
+				}
+			});
+		})();
+	}
+});

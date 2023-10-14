@@ -1,0 +1,19 @@
+m.addEvent("onInit",function(minitalk,channel,user) {
+	minitalk.printMessage("plugin","[주소입력금지플러그인] 회원권한 미만의 유저는 채팅창에 URL을 적을 수 없습니다.");
+});
+
+m.addEvent("beforeSendMessage",function(minitalk,message,user) {
+	if (user.opper == "GUEST" || user.opper == "NICKGUEST") {
+		if (message.search(/(http|https|ftp):\/\//) >= 0) {
+			minitalk.printMessage("error","URL이 포함된 내용은 전송할 수 없습니다.");
+			minitalk.sendProtocol("alertURL",{message:user.nickname+"님이 URL이 포함된 메세지를 전송하려고 하였습니다."});
+			return false;
+		}
+	}
+	
+	return true;
+});
+
+m.addProtocol("alertURL",function(minitalk,data) {
+	minitalk.printMessage("error",data.message);
+});

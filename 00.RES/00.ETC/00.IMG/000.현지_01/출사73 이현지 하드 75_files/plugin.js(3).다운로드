@@ -1,0 +1,33 @@
+m.addEvent("onInit",function(minitalk) {
+	minitalk.printMessage("plugin","[장기한판!] 장기를 두고 싶은 사람의 닉네임을 클릭해 함께 장기한판! 메뉴를 선택해 장기를 즐겨보세요.");
+});
+
+m.addUserMenu({
+	icon:m.getPluginPath("janggi")+"/images/icon_janggi.png",
+	text:"함께 장기한판!",
+	viewMenu:function(minitalk,user,myinfo) {
+		if (user.nickname == myinfo.nickname || user.device != "PC" || myinfo.device != "PC") return false;
+		else return true;
+	},
+	fn:function(minitalk,user,myinfo) {
+		minitalk.openPluginChannel("janggi","",1100,700,{invite:user.nickname});
+	}
+});
+
+m.addProtocol("janggiInvite",function(minitalk,data) {
+	var message = "<b><u>"+data.nickname+"</u></b>님이 <b><u>"+m.getTime(new Date().getTime(),"full")+"</u></b>에 <b><u>1:1 장기한판!</u></b>에 초대하였습니다.";
+	
+	var showAlert = m.showAlert("invite",data.code,message+"<br />해당 초대를 수락하거나, 거절하시려면 이곳을 클릭하세요.",false,data,function(alert) {
+		if (confirm("1:1 장기한판! 초대를 수락하시겠습니까?") == true) {
+			return m.openPluginChannel("janggi",data.code,1100,700,{nickname:data.nickname});
+		} else {
+			m.sendProtocol("janggiReject",{nickname:m.myinfo.nickname},data.pluginChannel,data.nickname);
+		}
+	});
+	
+	if (showAlert !== false) {
+		m.playSound("IRCQUERY");
+		m.doPush("[MiniTalk6] "+message.replace(/<(.*?)>/g,''));
+		m.printMessage("system",message);
+	}
+});
