@@ -1,0 +1,183 @@
+var MyFB = {};
+MyFB.info = {
+        'appid'      : 0,
+        'version'    : 'v2.8',
+		'channelURL' : '',
+		'oauth'      : true,
+		'handlekey'  : '',
+		'init'       : false,
+		'forced'     : false,
+		};
+// Facebook Module Initiation below
+setTimeout(function () {
+(function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/zh_TW/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+} , 400);
+
+MyFB.init = function () {
+	    FB.init({
+            appId  : this.info['appid'],
+            version    : 'v3.1',
+            status : true, // check login status
+            cookie : true, // enable cookies to allow the server to access the session
+            //      xfbml : true, // parse XFBML
+            // channelURL : this.info['channelURL'], // channel.html file
+            //     oauth  : true // enable OAuth 2.0
+        });
+
+        FB.Event.subscribe('auth.login', function(response) {
+            //MyFB.ask('MyFB.login();' , response);
+        });
+        FB.Event.subscribe('auth.logout', function(response) {
+            //this.ask(this.logout , response);
+        });
+
+        FB.getLoginStatus(function(response) {
+            if (response.session) {
+                // logged in and connected user, someone you know
+                if(this.info['handlekey']) hideWindow(this.info['handlekey']);
+                ajaxget('plugin/?id=fb:fblogin&act=logging&do=login' , 'return_message');
+            }
+        });
+        ExtraFunc_FBEXTRA();
+        this.info['init'] = true;
+};
+MyFB.ask = function (func , response) {
+    //showDialog('Facebook Action. Allow ?' , 'notice' , 'login' , func);
+}
+
+MyFB.login = function() {
+    if(!this.info['init']) this.init();
+        FB.login(function(response) {
+            if(MyFB.info['handlekey']) hideWindow(MyFB.info['handlekey']);
+                if (response.session) {
+                    if (response.perms) {
+	                    var uid = response.authResponse.userID;
+                        var accessToken = response.authResponse.accessToken;
+						MyFB.syncFBLPost(accessToken , response.perms);
+                        //showWindow('switchwin' , 'plugin/?id=fb:fblogin&act=logging&token=' + accessToken + '&do=login&perms=' + response.perms + (MyFB.info['forced'] == true ? '&fb_forced=yes' : ''));
+						MyFB.info['forced'] = false;
+                    // user is logged in and granted some permissions.
+                    // perms is a comma separated list of granted permissions
+                    } else {
+                        showWindow('switchwin' , 'plugin/?id=fb:fblogin&act=logging&do=noperm');
+						MyFB.info['forced'] = false;
+                    // user is logged in, but did not grant any permissions
+                    }
+                } else {
+				    if(response.status === 'connected') {
+					    var accessToken = response.authResponse.accessToken;
+						MyFB.syncFBLPost(accessToken , '');
+					    //showWindow('MyFBwin' , 'plugin/?id=fb:fblogin&act=logging&token=' + accessToken + '&do=login' + (MyFB.info['forced'] == true ? '&fb_forced=yes' : ''));
+						MyFB.info['forced'] = false;
+					} else {
+                // user is not logged in
+						if($('fwin_content_login')) {
+						    var parent = $('fwin_content_login').childNodes[1];
+						    var suffix = parent.id.split('_')[2];
+						    display('loginform_' + suffix);
+						    $('returnmessage_' + suffix).innerHTML = 'User Login';
+						    display('fb_login_cmd');
+							display('fb_login_loadinglayer');
+	                    }
+                    //showWindow('switchwin' , 'plugin/?id=fb:fblogin&act=logging&do=cancel');
+					MyFB.info['forced'] = false;
+					}
+                }
+            },
+            {scope:'email'}
+        );
+    };
+MyFB.logout = {};
+MyFB.postfeed = function(link , picture , name , caption , description , message) {
+    if(!this.info['init']) this.init();
+
+        };
+
+MyFB.syncFBLPost = function(accessToken , perms) {
+    var loginwin = $('fwin_content_login');
+	$('append_parent').innerHTML += '<div id="fb_login_ajaxrep" style="display:none;"></div><form id="fb_loginform_ajax" style="display:none;" method="post" action="'+window.SITEURL+'plugin/?id=fb:fblogin&act=logging&do=login' + (MyFB.info['forced'] == true ? '&fb_forced=yes' : '') + '"><input type="hidden" name="token" value="' + accessToken + '"/><input type="hidden" name="perms" value="' + perms + '"/></form>';
+    ajaxpost('fb_loginform_ajax' , loginwin ? 'fb_login_loadinglayer' : 'fb_login_ajaxrep' , loginwin ? 'fb_login_loadinglayer' : 'fb_login_ajaxrep' , 0 , '' , function () {
+		if(!loginwin) {
+		        showDialog($('fb_login_ajaxrep').innerHTML , 'notice' , 'Facebook Notice');
+		}
+		$('append_parent').removeChild($('fb_login_ajaxrep'));
+		$('append_parent').removeChild($('fb_loginform_ajax'));
+		//setTimeout('location.href=location.href;' , 2000);
+	});
+};
+
+MyFB.getstatus = function() {
+    if(!this.info['init']) this.init();
+            FB.getLoginStatus(function(response) {
+                if (response.session) {
+                    // logged in and connected user, someone you know
+                    if(this.info['handlekey']) hideWindow(this.info['handlekey']);
+	                ajaxget('plugin/?id=fb:fblogin&act=logging&do=login' , 'return_message');
+                }
+                if (response.status === 'connected') {
+    // the user is logged in and has authenticated your
+    // app, and response.authResponse supplies
+    // the user's ID, a valid access token, a signed
+    // request, and the time the access token
+    // and signed request each expire
+                    var uid = response.authResponse.userID;
+                    var accessToken = response.authResponse.accessToken;
+                    showWindow('switchwin' , 'plugin/?id=fb:fblogin&act=logging&token' + accessToken + '&do=login&perms=' + response.perms);
+                } else if (response.status === 'not_authorized') {
+				    showWindow('switchwin' , 'plugin/?id=fb:fblogin&act=logging&do=noperm');
+    // the user is logged in to Facebook,
+    // but has not authenticated your app
+                } else {
+     // FB login
+                    MyFB.login();
+    // the user isn't logged in to Facebook.
+                }
+ });
+};
+
+//Ajax XML Loaders
+var xmlhttp;
+function loadXMLDoc(url,cfunc)
+{
+if (window.XMLHttpRequest)
+{// code for IE7+, Firefox, Chrome, Opera, Safari
+xmlhttp=new XMLHttpRequest();
+}
+else
+{// code for IE6, IE5
+xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+}
+xmlhttp.onreadystatechange=cfunc;
+xmlhttp.open("GET",url,true);
+xmlhttp.send();
+}
+
+
+// function fbloginClick(){
+//     if($('fwin_content_login')) {
+//     var parent = $('fwin_content_login').childNodes[1];
+// 	var suffix = parent.id.split('_')[2];
+// 	    display('loginform_' + suffix);
+// 		$('returnmessage_' + suffix).innerHTML = 'Facebook Login in progress...';
+//         display('fb_login_cmd');
+// 		display('fb_login_loadinglayer');
+// 	}
+// 	MyFB.login();
+// }
+
+function fbloginClick(){
+    FB.login(function(response) {
+        if(response.status === 'connected' && response.authResponse) {
+            var accessToken = response.authResponse.accessToken;
+            MyFB.syncFBLPost(accessToken , '');
+            MyFB.info['forced'] = false;
+        }
+    }, {scope: 'public_profile,email'});
+    return false;
+}

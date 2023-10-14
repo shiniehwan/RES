@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="39.831" viewBox="0 0 92.06 39.831">
+ <style>
+    svg { cursor: pointer; }
+    #badge { visibility: hidden }
+  </style>
+  <g id="im-btn" transform="translate(-767 90.831)" style="filter: grayscale(1)">
+    <g id="btn" transform="translate(769 -84)">
+      <rect id="bg" width="80.66" height="35" rx="17.5" transform="translate(-1.572 -2)" fill="#3e3e36"/>
+      <text id="txt" transform="translate(71.975 22.169)" fill="#fff" font-size="18" font-family="PingFangTC-Semibold, PingFang TC" font-weight="600"><tspan x="-36" y="0">訊息</tspan></text>
+      <g id="Group_7595" data-name="Group 7595" transform="translate(0 0.169)">
+        <g id="icn" transform="translate(5.315 3)">
+          <path id="Union_76" data-name="Union 76" d="M4.567,21.909l.133-.133a1.142,1.142,0,0,1,1.545-1.545l.122-.122A9.8,9.8,0,0,0,20.109,6.367l1.8-1.8A12.33,12.33,0,0,1,4.567,21.909ZM0,12.33A12.331,12.331,0,0,1,19.58,2.356a1.37,1.37,0,1,1-1.616,1.954A9.8,9.8,0,0,0,4.575,18.324l-1.8,1.8A12.279,12.279,0,0,1,0,12.33Zm7.588,3.01a1.5,1.5,0,1,1,2.993,0,1.5,1.5,0,1,0,2.993,0V6.334A1.509,1.509,0,0,1,14,5.263a1.494,1.494,0,0,1,2.462.482,1.51,1.51,0,0,1,.109.588v9.029a1.488,1.488,0,0,1-.038.344,4.476,4.476,0,0,1-8.94-.368ZM7.3,11.195a1.6,1.6,0,1,1,1.6,1.6A1.6,1.6,0,0,1,7.3,11.195Z" transform="translate(0 0)" fill="#19d2b2"/>
+        </g>
+      </g>
+    </g>
+    <g id="badge" transform="translate(833.872 -77.831)">
+      <rect id="Rectangle_2897" data-name="Rectangle 2897" width="30" height="18" rx="9" transform="translate(-4.385 -13)" fill="#b00100"/>
+      <text id="_99_" data-name="99+" transform="translate(11 -11)" fill="#fff" font-size="12" font-family="ArialMT, Arial"><tspan x="-10.178" y="11">99+</tspan></text>
+    </g>
+  </g>
+</svg>

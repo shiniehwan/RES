@@ -1,0 +1,47 @@
+﻿jQuery(document).ready(function($){
+	$('#forumNav').append('		<ol>\
+			<h2>話題</h2>\
+			<li><a href="forum-736-1.html">網路美女</a></li>\
+			<li><a href="forum-535-1.html">AV女優</a></li>\
+			<li><a href="forum-1410-1.html">寫真模特</a></li>\
+			<li><a href="forum-1409-1.html">JLive</a></li>\
+			<li><a href="forum-555-1.html">新聞版</a></li>\
+			<li><a href="forum-374-1.html">閒聊版</a></li>\
+		</ol>\
+		<ol>\
+			<h2>美女</h2>\
+			<li><a href="forum-520-1.html">台灣美女</a></li>\
+			<li><a href="forum-393-1.html">亞洲美女</a></li>\
+			<li><a href="forum-522-1.html">歐美美女</a></li>\
+			<li><a href="forum-1112-1.html">JKF女郎</a></li>\
+			<li><a href="forum-574-1.html">素人正妹</a></li>\
+			<li><a href="forum-640-1.html">COSPLAY</a></li>\
+		</ol>\
+		<ol>\
+			<h2>Dance</h2>\
+	        <li><a href="forum-587-1.html">展場女郎</a></li>\
+			<li><a href="forum-611-1.html">夜店辣妹</a></li>\
+			<li><a href="forum-610-1.html">熱舞視頻</a></li>\
+			<li><a href="forum-639-1.html">電音舞曲</a></li>\
+		</ol>\
+		<ol>\
+			<h2>娛樂</h2>\
+			<li><a href="forum-141-1.html">漫畫版</a></li>\
+			<li><a href="forum-761-1.html">動漫圖</a></li>\
+		</ol>\
+		<ol>\
+			<h2>時尚</h2>\
+			<li><a href="forum-506-1.html">男女生活</a></li>\
+			<li><a href="forum-481-1.html">流行趨勢</a></li>\
+			<li><a href="forum-505-1.html">超跑精品</a></li>\
+			<li><a href="forum-164-1.html">影劇新聞</a></li>\
+			<li><a href="forum-279-1.html">玩具新聞</a></li>\
+		</ol>\
+		<ol>\
+			<h2>會員</h2>\
+			<li><a href="forum-15-1.html">發問區</a></li>\
+			<li><a href="forum-191-1.html">教學版</a></li>\
+			<li><a href="forum-240-1.html">勳章版</a></li>\
+			<li><a href="forum-59-1.html">測試區</a></li>\
+		</ol>');
+});

@@ -1,0 +1,27 @@
+var agree18 = getcookie('agree18');
+if(!agree18){
+	var aj=new Ajax('HTML');
+	aj.get('agree18.php', function(s){
+		showDialog(s, 'confirm', 'JKF論壇提示', agreed, 1, disagreed, '', '是，我已滿18', '否');
+	});
+}
+
+function agreed(){
+	//var cookieOneMonth = document.agree18.periodaggre18.value;
+	var chks = document.getElementsByName("periodaggre18");
+	if(chks[0].checked){
+		setcookie('agree18', 1, 2592000);
+	}else{
+		if(agree18time){
+			setcookie('agree18', 1, agree18time);
+		}else{
+			setcookie('agree18', 1);
+		}
+	}
+
+}
+
+function disagreed(){
+	setcookie('agree18', 0, agree18time);
+	window.location.href = 'index.php';
+}

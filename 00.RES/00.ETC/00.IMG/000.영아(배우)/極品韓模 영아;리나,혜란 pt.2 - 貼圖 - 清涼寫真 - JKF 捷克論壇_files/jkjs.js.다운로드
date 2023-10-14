@@ -1,0 +1,1630 @@
+﻿/*
+ *
+ * name: JKJS Framework
+ * version: 1.0.0
+ * description: a framework which manages resources from javascript files, css files and provides foundation functionality.
+ *
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
+ *
+ * Copyright 2015 Irvin Huang
+ */
+ /**
+ * @class window
+ */
+(function($w, $d, $h){
+if($w.XMLHttpRequest){
+	if(!XMLHttpRequest.UNSENT) XMLHttpRequest.UNSENT = 0;
+	if(!XMLHttpRequest.OPENED) XMLHttpRequest.OPENED = 1;
+	if(!XMLHttpRequest.HEADERS_RECEIVED) XMLHttpRequest.HEADERS_RECEIVED = 2;
+	if(!XMLHttpRequest.LOADING) XMLHttpRequest.LOADING = 3;
+	if(!XMLHttpRequest.DONE) XMLHttpRequest.DONE = 4;
+}
+
+// Production steps of ECMA-262, Edition 5, 15.4.4.19
+// Reference: http://es5.github.com/#x15.4.4.19
+if (!Array.prototype.map) {
+  Array.prototype.map = function(callback, thisArg) {
+
+	var T, A, k;
+
+	if (this == null) {
+	  throw new TypeError(" this is null or not defined");
+	}
+
+	// 1. Let O be the result of calling ToObject passing the |this| value as the argument.
+	var O = Object(this);
+
+	// 2. Let lenValue be the result of calling the Get internal method of O with the argument "length".
+	// 3. Let len be ToUint32(lenValue).
+	var len = O.length >>> 0;
+
+	// 4. If IsCallable(callback) is false, throw a TypeError exception.
+	// See: http://es5.github.com/#x9.11
+	if (typeof callback !== "function") {
+	  throw new TypeError(callback + " is not a function");
+	}
+
+	// 5. If thisArg was supplied, let T be thisArg; else let T be undefined.
+	if (thisArg) {
+	  T = thisArg;
+	}
+
+	// 6. Let A be a new array created as if by the expression new Array(len) where Array is
+	// the standard built-in constructor with that name and len is the value of len.
+	A = new Array(len);
+
+	// 7. Let k be 0
+	k = 0;
+
+	// 8. Repeat, while k < len
+	while(k < len) {
+
+	  var kValue, mappedValue;
+
+	  // a. Let Pk be ToString(k).
+	  //   This is implicit for LHS operands of the in operator
+	  // b. Let kPresent be the result of calling the HasProperty internal method of O with argument Pk.
+	  //   This step can be combined with c
+	  // c. If kPresent is true, then
+	  if (k in O) {
+
+		// i. Let kValue be the result of calling the Get internal method of O with argument Pk.
+		kValue = O[ k ];
+
+		// ii. Let mappedValue be the result of calling the Call internal method of callback
+		// with T as the this value and argument list containing kValue, k, and O.
+		mappedValue = callback.call(T, kValue, k, O);
+
+		// iii. Call the DefineOwnProperty internal method of A with arguments
+		// Pk, Property Descriptor {Value: mappedValue, : true, Enumerable: true, Configurable: true},
+		// and false.
+
+		// In browsers that support Object.defineProperty, use the following:
+		// Object.defineProperty(A, Pk, { value: mappedValue, writable: true, enumerable: true, configurable: true });
+
+		// For best browser support, use the following:
+		A[ k ] = mappedValue;
+	  }
+	  // d. Increase k by 1.
+	  k++;
+	}
+
+	// 9. return A
+	return A;
+  };
+}
+
+// Production steps of ECMA-262, Edition 5, 15.4.4.14
+// Reference: http://es5.github.io/#x15.4.4.14
+if (!Array.prototype.indexOf) {
+Array.prototype.indexOf = function(searchElement, fromIndex) {
+
+	var k;
+
+	// 1. Let O be the result of calling ToObject passing
+	//	  the this value as the argument.
+	if (this == null) {
+	  throw new TypeError('"this" is null or not defined');
+	}
+
+	var O = Object(this);
+
+	// 2. Let lenValue be the result of calling the Get
+	//	  internal method of O with the argument "length".
+	// 3. Let len be ToUint32(lenValue).
+	var len = O.length >>> 0;
+
+	// 4. If len is 0, return -1.
+	if (len === 0) {
+	  return -1;
+	}
+
+	// 5. If argument fromIndex was passed let n be
+	//	  ToInteger(fromIndex); else let n be 0.
+	var n = +fromIndex || 0;
+
+	if (Math.abs(n) === Infinity) {
+	  n = 0;
+	}
+
+	// 6. If n >= len, return -1.
+	if (n >= len) {
+	  return -1;
+	}
+
+	// 7. If n >= 0, then Let k be n.
+	// 8. Else, n<0, Let k be len - abs(n).
+	//	  If k is less than 0, then let k be 0.
+	k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+	// 9. Repeat, while k < len
+	while (k < len) {
+		// a. Let Pk be ToString(k).
+		//   This is implicit for LHS operands of the in operator
+		// b. Let kPresent be the result of calling the
+		//	HasProperty internal method of O with argument Pk.
+		//   This step can be combined with c
+		// c. If kPresent is true, then
+		//	i.	Let elementK be the result of calling the Get
+		//		internal method of O with the argument ToString(k).
+		//   ii.	Let same be the result of applying the
+		//		Strict Equality Comparison Algorithm to
+		//		searchElement and elementK.
+		//  iii.	If same is true, return k.
+		if (k in O && O[k] === searchElement) {
+			return k;
+		}
+		k++;
+	}
+	return -1;
+};
+}
+
+// if(!Array.prototype.shuffle){
+// 	Array.prototype.shuffle = function() {
+// 		var j, x, i, a = this;
+// 		for (i = a.length; i; i -= 1) {
+// 			j = Math.floor(Math.random() * i);
+// 			x = a[i - 1];
+// 			a[i - 1] = a[j];
+// 			a[j] = x;
+// 		}
+// 		return a;
+// 	}
+// }
+
+if(typeof String.prototype.trim !== 'function') {
+	String.prototype.trim = function() {
+		return this.replace(/^\s+|\s+$/g, '');
+	}
+}
+
+if (!Function.prototype.bind) {
+	Function.prototype.bind = function(oThis) {
+		if (typeof this !== 'function') {
+			// closest thing possible to the ECMAScript 5
+			// internal IsCallable function
+			throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+		}
+
+		var aArgs	= Array.prototype.slice.call(arguments, 1),
+			fToBind = this,
+			fNOP	= function() {},
+			fBound	= function() {
+			  return fToBind.apply(this instanceof fNOP || oThis
+					 ? this
+					 : oThis,
+					 aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
+
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+
+		return fBound;
+	};
+}
+
+if ($w.addEventListener && Function.prototype.name === undefined && Object.defineProperty !== undefined) {
+	Object.defineProperty(Function.prototype, 'name', {
+		get: function() {
+			var funcNameRegex = /function\s([^(]{1,})\(/;
+			var results = (funcNameRegex).exec((this).toString());
+			return (results && results.length > 1) ? results[1].trim() : "";
+		},
+		set: function(value) {}
+	});
+}
+
+/**
+ * Defines a custom class.
+ * @class JKDefineClass
+ * @param {string} name - The name of the custom class.
+ * @param {function} newConstructor - The constructor of the custom class.
+ */
+$w.JKDefineClass = function(name, newConstructor){
+	/**
+	 * Indicates the class name with namespace for the custom class.
+	 * @type {string}
+	 */
+	this.classId = name;
+
+	/**
+	 * The constructor for the custom class.
+	 * @type {function}
+	 */
+	this.newConstructor = newConstructor;
+}
+
+/**
+ * Returns a classId of custom class.
+ * @function valueOf
+ * @memberof JKDefineClass#
+ */
+$w.JKDefineClass.prototype.valueOf = function(){
+	return this.classId;
+};
+
+/**
+ * Creates an instance of the custom class. You can pass arguments for the custom class.
+ * @function $new
+ * @memberof JKDefineClass#
+ * @param {...JKJS.Any=} params - The parameters for the custom class.
+ * @returns {JKObject} an instance of defined custom class.
+ */
+$w.JKDefineClass.prototype.$new = function(){
+	var params = [null];
+	params = params.concat(Array.prototype.slice.call(arguments));
+	var obj = new (Function.prototype.bind.apply(this.newConstructor, params));
+	obj.type = this;
+	obj.init && obj.init();
+	return obj;
+};
+
+function JKToType(){
+	return this.constructor.name;
+}
+
+//JKDefineClass.prototype.$toType = JKToType;
+
+/**
+ * Defines a class under namespace.
+ * @function $define
+ * @memberof JKDefineClass#
+ * @param {string} name - The name of the custom class.
+ * @param {function} constructor - The constructor of the custom class.
+ * @returns {JKDefineClass} this will be assigned under a namespace. ex., JKJS.Url and you can JKJS.Url.$new()
+ */
+$w.JKDefineClass.prototype.$define = function(name, constructor){
+	if(this){
+		name = this.classId + '.' + name;
+	}
+
+	return new JKDefineClass(name, constructor);
+};
+
+$w.JKDefineClass.prototype.$create = function(defineClass){
+	var obj = (arguments.length > 1 ? new defineClass.newConstructor(arguments[1]) : new defineClass.newConstructor());
+	obj.type = defineClass;
+	return obj;
+};
+
+/*
+Object.defineProperty(Object.prototype, '$fieldLength', {
+	get: function() {
+		var index=0;
+		for(var i in this){
+			if(i[0] == '$') continue;
+			index++;
+		}
+
+		return index;
+	},
+	set: function(value) {}
+});
+*/
+
+$w.JKJS = (new JKDefineClass('JKJS',
+/**
+ * Provides fundamental functions. There should be only one instance of JKJS.
+ * @class JKJS
+ */
+function(){
+	/** @namespace */
+	var self = this;
+
+	self._sys = {
+		debug: true
+	};
+
+	/**
+	 * Indicates a primitive type "string" in Javascript.
+	 * @alias String
+	 * @type {String}
+	 * @memberof JKJS
+	 */
+	self.String = 'string';
+	/**
+	 * Indicates a primitive type "number" in Javascript.
+	 * @alias Number
+	 * @type {String}
+	 * @memberof JKJS
+	 */
+	self.Number = 'number';
+	/**
+	 * Indicates a primitive type "boolean" in Javascript.
+	 * @alias Boolean
+	 * @type {String}
+	 * @memberof JKJS
+	 */
+	self.Boolean = 'boolean';
+	/**
+	 * Indicates a primitive type "object" in Javascript. We still treat it as a object generally. In JKJS Object System, it means an unkown object.
+	 * @alias Object
+	 * @type {String}
+	 * @memberof JKJS
+	 */
+	self.Object = 'object';
+	/**
+	 * Indicates a primitive type "function" in Javascript.
+	 * @alias Function
+	 * @type {String}
+	 * @memberof JKJS
+	 */
+	self.Function = 'function';
+	/**
+	 * Indicates a dynamic type to any primitive types and JKJS types.
+	 * @alias Any
+	 * @type {String}
+	 * @memberof JKJS
+	 */
+	self.Any = 'dynamic';
+
+
+	/**
+	 * Returns JKJS Object Type if the obj supports
+	 * @function getType
+	 * @memberof JKJS
+	 * @param {JKJS.Any} obj - the obj to its type.
+	 * @returns {string} this is a string which indicates the type of the obj.
+	 */
+	self.getType = function(obj){
+		if(typeof obj != 'object') return typeof obj;
+		if(obj.type) return obj.type.classId;
+
+		return typeof obj;
+		//return obj.constructor.name;
+	};
+
+	/**
+	 * Returns the number of members in an obj
+	 * @function fieldLength
+	 * @memberof JKJS
+	 * @param {JKJS.Any} obj - the obj to its type.
+	 * @returns {JKJS.Number} this will ignore members prefixed with symbol $.
+	 */
+	self.fieldLength = function(obj){
+		var self = null;
+		var index=0;
+		for(var i in obj){
+			if(i[0] == '$') continue;
+			index++;
+		}
+
+		return index;
+	};
+
+	/**
+	 * Initiates JKJS.Message
+	 * @function init
+	 * @memberof JKJS
+	 */
+	self.init = function(){
+		self.Message = self.type.$define('Message', function(){
+			var self = this;
+			var definitions = [];
+			self.define = function(receiver, params){
+
+				if(definitions[receiver]) definitions[receiver].push(params);
+				else definitions[receiver] = [params];
+			};
+			self.build = function(receiver, params){
+				var type_def;
+				var p_index;
+				var fields = {};
+
+				for(var i in definitions[receiver]){
+
+					if(typeof definitions[receiver][i] != 'object' || params.length != JKJS.fieldLength(definitions[receiver][i])) continue;
+					p_index = 0;
+
+					for(o in definitions[receiver][i]){
+						//if(o.indexOf(':') == -1 || o[0] == '$') continue;
+						//type_def = o.split(':');
+						//if(type_def[1] != JKJS.getType(params[p_index])) break;
+						//fields[type_def[0]] = params[p_index];
+
+						if(o[0] == '$') continue;
+						if(definitions[receiver][i][o] != JKJS.getType(params[p_index]) && definitions[receiver][i][o] != JKJS.Any) break;
+						fields[o] = params[p_index];
+						p_index++;
+					}
+
+					if(p_index == JKJS.fieldLength(definitions[receiver][i])){
+						return fields;
+						break;
+					}
+				}
+			};
+		});
+
+		self.DebugType = self.type.$define('DebugType', function(){
+			var params = JKJS.message.build('JKDebugType', arguments[0]);
+			var self = this;
+			self.name = params.name;
+			self.console = params.consoleType;
+		});
+
+		//self.message = Object.$new(self.Message);
+		self.message = self.Message.$new();
+
+		//var self = null;
+	};
+
+	/**
+	 * Loads a script tag or css tag.
+	 * @function load
+	 * @memberof JKJS
+	 * @param {JKJS.String} source_type - enum[script, css].
+	 * @param {JKJS.Url} source - the URL to file.
+	 * @param {JKJS.Function} onload - fires when the file is loaded.
+	 * @param {JKJS.String=} param1 - enum[css-media-value, others].
+	 */
+	self.load = function(source_type, source, onload, param1){
+		if(source_type == 'script'){
+			var s='script',
+				done = false,
+				j=$d.createElement(s);
+			j.async=source.async;
+			j.onload = j.onreadystatechange = function(){
+				if ( !done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") ) {
+					done = true;
+					// Handle memory leak in IE
+					j.onload = j.onreadystatechange = null;
+					if(typeof onload == 'function'){
+						if($jkfjs.evtonloads[source.pathinfo[2]]) $jkfjs.evtonloads[source.pathinfo[2]].push(onload);
+						else $jkfjs.evtonloads[source.pathinfo[2]] = [onload];
+						//onload.call(self, source);
+					}
+				}
+			};
+			j.src=source.text;
+			$h.appendChild(j);
+
+		}else if(source_type == 'css'){
+			var s='link',
+				done = false,
+				j=$d.createElement(s);
+			j.async=source.async;
+			j.rel = 'stylesheet';
+			j.type = 'text/css';
+			j.media = param1;
+			j.onload = j.onreadystatechange = function(){
+				if ( !done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") ) {
+					done = true;
+					// Handle memory leak in IE
+					j.onload = j.onreadystatechange = null;
+					if(typeof onload == 'function') onload.call(self, source);
+				}
+			};
+			j.href=source.text;
+			$h.appendChild(j);
+		}
+	};
+})).$new();
+
+/**
+ * Implments XMLHttpRequest and wrappers for request method of GET, POST
+ * @class JKJS.Net
+ */
+JKJS.Net = JKJS.type.$define('Net', function(){
+	var params = JKJS.message.build('JKJS.Net', arguments);
+	var self = this;
+	var is_supported = false;
+
+	if ($w.XMLHttpRequest){
+		// code for IE7+, Firefox, Chrome, Opera, Safari
+		is_supported = true;
+	}
+
+	/**
+	 * A low level api to communicate with servers by XMLHttpRequest.
+	 * @function ajax
+	 * @memberof JKJS.Net#
+	 * @param {JKJS.String|JKJS.Object} obj - enum[url, params].
+	 * @param {JKJS.Url} url - URL.
+	 * @param {JKJS.Boolean} async - enable async for XMLHttpRequest.
+	 * @param {JKJS.Object} post_param - post parameters.
+	 */
+	self.ajax = function(obj, url, async, post_param){
+		var self = this;
+		var params = {};
+
+		/**
+		 * Fail event of {@link JKJS.Net#ajax}.
+		 *
+		 * @event JKJS.Net#fail
+		 * @type {JKJS.Net#ajax}
+		 * @property {JKJS.Function} fail - Sets a handler for fail event of {@link JKJS.Net#ajax}.
+		 */
+		self.fail = function(f){
+			params.fail = f;
+			return this;
+		};
+
+		/**
+		 * Success event of {@link JKJS.Net#ajax}.
+		 *
+		 * @event JKJS.Net#success
+		 * @type {JKJS.Net#ajax}
+		 * @property {JKJS.Function} success - Sets a handler for success event of {@link JKJS.Net#ajax}.
+		 */
+		self.success = function(f){
+			params.success = f;
+			return this;
+		};
+
+		/**
+		 * Complete event of {@link JKJS.Net#ajax}.
+		 *
+		 * @event JKJS.Net#done
+		 * @type {JKJS.Net#ajax}
+		 * @property {JKJS.Function} done - Sets a handler for done event of {@link JKJS.Net#ajax}.
+		 */
+		self.done = function(f){
+			params.done = f;
+			return this;
+		};
+
+		/**
+		 * Send request and sets response type.
+		 * @function send
+		 * @memberof JKJS.Net#
+		 * @param {JKJS.String} [param=json] - sets response type.
+		 */
+		self.send = function(param){
+			if(typeof param == 'string'){
+				params.type = param;
+			}else{
+				params.type = 'json';
+			}
+			var obj = params;
+
+			//var xhr = $w.XDomainRequest ? new $w.XDomainRequest() : new $w.XMLHttpRequest();
+			var xhr = new $w.XMLHttpRequest();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == XMLHttpRequest.DONE){
+
+					if(xhr.status == 200){
+						var data;
+						if(obj.type == 'json') data = JSON.parse(xhr.responseText);
+						else data = xhr.responseText;
+						if(JKJS.getType(obj.success) == JKJS.Function) obj.success.call(self, data, obj, xhr);
+					}else{
+						if(JKJS.getType(obj.fail) == JKJS.Function) obj.fail.call(self, obj, xhr);
+					}
+
+					if(JKJS.getType(obj.done) == JKJS.Function) obj.done.call(self, obj, xhr);
+
+					obj = null;
+				}
+			}
+
+			xhr.open(params.method, params.url, params.async);
+			if(params.method == 'post') xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			xhr.send(params.parameters_seriallized);
+			params = null;
+		};
+
+		/**
+		 * This is same as {@link JKJS.Net#send}, but more readable.
+		 * @function response
+		 * @memberof JKJS.Net#
+		 * @param {JKJS.String} [param=text] - sets response type. Notice, the default value is "text" not "json".
+		 */
+		self.response = function(type){
+			if(type == 'json') this.send(type);
+			else this.send('text');
+		};
+
+		if(typeof obj == 'string'){
+			params.method = obj;
+			params.url = url;
+			//params.async = async === false ? async : true;
+			if(typeof async == JKJS.Boolean) params.async = async;
+			else if(typeof post_param == JKJS.Boolean) params.async = post_param;
+			else params.async = true;
+
+			if(typeof async == JKJS.Object) params.parameters = async;
+			else if(typeof post_param == JKJS.Object) params.parameters = post_param;
+			else params.parameters = null;
+
+			params.parameters_seriallized = [];
+
+			for(i in params.parameters){
+				if(i[0] == '$') break;
+				params.parameters_seriallized.push(i + '=' + params.parameters[i]);
+			}
+
+			params.parameters_seriallized = params.parameters_seriallized.join('&');
+
+			return;
+		}else if(typeof obj == 'object'){
+			params = obj;
+		}else return;
+
+		self.send();
+	};
+
+	//xmlhttp = new XMLHttpRequest();
+
+	self.get = function(u, a){
+		return new self.ajax('get', u, a);
+	};
+
+	self.post = function(u, p, a){
+		return new self.ajax('post', u, a, p);
+	};
+});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String, 'async': JKJS.Boolean});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String, 'method': JKJS.String});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String, 'method': JKJS.String, 'param': JKJS.Object});
+
+/**
+ * A Object which conatins the url of request, the async of request and the method of request.
+ * When async is true, it affects requested object to act in async way.
+ * ex., sending an instance of {@link JKJS.Url} with {@link JKJS.Url#async}=true to {@link JKJS.Net#ajax} will make XMLHttpRequest asynchronously.
+ * @class JKJS.Url
+ * @param {JKJS.String} url - The URL of request.
+ * @param {JKJS.Boolean=} async - Makes targeted object asynchronously.
+ * @param {JKJS.String=} method - The method of request. Enum[GET, POST].
+ * @param {JKJS.Object=} param - Post parameters.
+ */
+JKJS.Url = JKJS.type.$define('Url', function(){
+	/**
+	 * Makes targeted object asynchronously.
+	 * @alias async
+	 * @type {JKJS.Boolean}
+	 * @memberof JKJS.Url#
+	 */
+	$w[null];
+	/**
+	 * The method of request. Enum[GET, POST].
+	 * @alias method
+	 * @type {JKJS.String}
+	 * @memberof JKJS.Url#
+	 */
+	$w[null];
+	/**
+	 * The URL of request.
+	 * @alias url
+	 * @type {JKJS.String}
+	 * @memberof JKJS.Url#
+	 */
+	$w[null];
+
+	var params = JKJS.message.build('JKJS.Url', arguments);
+	var self = this;
+
+	if('async' in params) self.async = params.async;
+	if('method' in params) self.method = params.method;
+	self.text = params.url;
+	//[1]=hostname, [2]=path, [3]=query
+	self.pathinfo = params.url.match(/\/\/(.+?[^\/]*)\/?(.*?[^?]*)\??(.*)/);
+	if(self.pathinfo) self.pathinfo[2] = self.pathinfo[2].replace($jkfjs.lib_repo_path, '');
+	else self.pathinfo = [null, null, params.url, null];
+	self.valueOf = function(){
+		return this.text;
+	};
+});
+
+/*
+JKJS.Resource = JKJS.type.$define('Resource', function(){
+	var params = JKJS.message.build('JKJS.Resource', arguments);
+	var self = this;
+
+});
+
+JKJS.Resource.JS = JKJS.Resource.$define('JS', function(){
+
+});
+
+JKJS.Resource.CSS = JKJS.Resource.$define('CSS', function(){
+
+});
+*/
+
+/**
+ * Task records how many works to do and fires a callabck event when works are done.
+ * @class JKJS.Task
+ * @param {JKJS.String} name - The identity to the task.
+ * @param {JKJS.Number} count - The number of works to do asynchronously.
+ */
+JKJS.Task = JKJS.type.$define('Task', function(){
+	var params = JKJS.message.build('JKJS.Task', arguments);
+	var self = this;
+
+	self.name = params.name;
+	self.count = params.count;
+	self.run = function(){};
+	self.done = function(){
+		$w.$jkfjs.tasks[self.name].done++;
+		if($w.$jkfjs.tasks[self.name].done >= $w.$jkfjs.tasks[self.name].count){
+			$w.$jkfjs.tasks[self.name].finish.call(self);
+			$w.$jkfjs.tasks[self.name] = null;
+			delete $w.$jkfjs.tasks[self.name];
+			self = self.done = null;
+		}
+	};
+});
+
+/**
+ * Makes tasks schedulable
+ * @class JKJS.Job
+ */
+JKJS.Job = JKJS.type.$define('Job', function(){
+	var params = JKJS.message.build('JKJS.Job', arguments);
+	var self = this;
+});
+
+//JKJS.message.define('JKDebugType', {'name':JKJS.String, 'consoleType':JKJS.String});
+//JKJS.debugNormal = Object.$new(JKJS.DebugType, ['normal', 'log']);
+
+//define constrcutor headers for JKJS.Net
+JKJS.message.define('JKJS.Net', {'url': JKJS.String});
+JKJS.message.define('JKJS.Net', {'url': JKJS.String, 'async': JKJS.Boolean});
+JKJS.message.define('JKJS.Net', {'url': JKJS.String, 'method': JKJS.String});
+JKJS.message.define('JKJS.Net', {'url': JKJS.String, 'method': JKJS.String, 'async': JKJS.Boolean});
+JKJS.message.define('JKJS.Net', {'url': JKJS.String, 'method': JKJS.String, 'param': JKJS.Object});
+JKJS.message.define('JKJS.Net', {'url': JKJS.String, 'method': JKJS.String, 'param': JKJS.Object, 'async': JKJS.Boolean});
+
+//define constrcutor headers for JKJS.Url
+JKJS.message.define('JKJS.Url', {'url': JKJS.String});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String, 'async': JKJS.Boolean});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String, 'method': JKJS.String});
+JKJS.message.define('JKJS.Url', {'url': JKJS.String, 'method': JKJS.String, 'param': JKJS.Object});
+
+//define constrcutor headers for JKJS.Resource
+JKJS.message.define('JKJS.Resource', {'instance': JKJS.Object});
+
+//define constrcutor headers for JKJS.Resource.JS
+JKJS.message.define('JKJS.Resource.JS', {'url': JKJS.String, 'version': JKJS.String});
+
+//define constrcutor headers for JKJS.Resource.CSS
+JKJS.message.define('JKJS.Resource.CSS', {'url': JKJS.String, 'version': JKJS.String});
+JKJS.message.define('JKJS.Resource.CSS', {'url': JKJS.String, 'media': JKJS.String, 'version': JKJS.String});
+
+//define constrcutor headers for JKJS.Task
+JKJS.message.define('JKJS.Task', {'name': JKJS.String, 'count': JKJS.Number});
+
+//define function headers for jkbug
+JKJS.message.define('jkbug', {'content': JKJS.String});
+JKJS.message.define('jkbug', {'content': JKJS.String, 'type': JKJS.String});
+JKJS.message.define('jkbug', {'content': JKJS.String, 'type': JKJS.String, 'assert': JKJS.Boolean});
+//JKJS.message.define('jkbug', {'content': JKJS.String, 'type': JKJS.DebugType.classId});
+//This is useless but
+function jkbug(){
+	if(JKJS._sys.debug && $w.console){
+		var params = JKJS.message.build('jkbug', arguments);
+		//JKJS.console(params.content, params.type);
+		if(params.type){
+			if(params.type == 'log') console.log(params.content);
+			else if(params.type == 'error') console.error(params.content);
+			else if(params.type == 'info') console.info(params.content);
+			else if(params.type == 'warn') console.warn(params.content);
+			else if(params.type == 'assert') console.assert(params.assert, params.content);
+		}else console.log(params.content);
+	}
+}
+
+//instances
+JKJS.net = JKJS.Net.$new();
+
+/**
+ * A object to control resources(ex., js, css, tasks,...etc).
+ * @class $jkfjs
+ */
+$w.$jkfjs = $d.createElement('div');
+/**
+ * The repository to get 3rd-party plugins.
+ * @alias lib_repo
+ * @type {JKJS.String}
+ * @memberof $jkfjs
+ */
+$w.$jkfjs.lib_repo = JKJS.Url.$new('http://cdn.jkfjs.com/jklib/');
+$w.$jkfjs.lib_repo_path = $jkfjs.lib_repo.pathinfo[2];
+/**
+ * A bundle tells JKJS what resources are needed at a time.
+ * @alias bundles
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ * @example <caption>How to create a bundle file.<br/>1. Create a javascript file and paste the source code below into the file.</caption>
+ * $jkfjs.bundle = {
+ * 	name: 'event_site_name',
+ * 	install: 'fancybox',
+ * 	js: [
+ * 		{file: 'js/index.js', version: '1'}
+ * 	],
+ * 	css: [
+ * 		{file: 'css/common.css', media: 'screen', version: '1'}
+ * 	]
+ * };
+ * @example <caption>How to execute a bundle file.<br/>1. JKJS will automatically execute example_bundle.js bundle file when it's ready.</caption>
+ * &lt;script id=&quot;jkjs&quot; src=&quot;jkjs.js&quot; data-jk-bundle=&quot;example_bundle.js&quot;&gt;&lt;/script&gt;
+ */
+$w.$jkfjs.bundles = {};
+
+/**
+ * Indicates what resoruces it has and be able to check their status.
+ * @alias resources
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ * @example <caption>How to create a resource file.<br/>1. Create a javascript file in {plugin_name}/{version} folder and name it as manifest.js<br/>2. paste the source code below into the file.</caption>
+ * $jkfjs.resource = {
+ * 	name: 'fancybox',
+ * 	required: {
+ * 		js: [
+ * 			{file: 'fancybox/source/jquery.fancybox.pack.js?v=2.1.5', version: '2.1.5'}
+ * 		],
+ * 		css: [
+ * 			{file: 'fancybox/source/jquery.fancybox.css?v=2.1.5', media: 'screen', version: '2.1.5'}
+ * 		],
+ * 		dependencies: [
+ * 			{resource: 'jquery', version: '2.1.4'}
+ * 		]
+ * 	},
+ * 	optional: {
+ * 		mousewheel: {
+ * 			js: [
+ * 				{file: 'fancybox/lib/jquery.mousewheel-3.0.6.pack.js', version: '3.0.6'}
+ * 			]
+ * 		},
+ * 		button: {
+ * 			js: [
+ * 				{file: 'fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.5', version: '1.0.5'},
+ * 				{file: 'fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.6', version: '1.0.6'}
+ * 			],
+ * 			css: [
+ * 				{file: 'fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.5', version: '1.0.5'}
+ * 			]
+ * 		},
+ * 		thumb: {
+ * 			js: [
+ * 				{file: 'fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.75', version: '1.0.75'}
+ * 			],
+ * 			css: [
+ * 				{file: 'fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7', version: '1.0.7'}
+ * 			]
+ * 		}
+ * 	}
+ * };
+ */
+$w.$jkfjs.resources = {};
+
+/**
+ * Indicates what resources are installed in app.
+ * @alias installed
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+$w.$jkfjs.installed = {};
+
+/**
+ * Indicates what plugins are installed in app.
+ * @alias installedPlugins
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+$w.$jkfjs.installedPlugins = {};
+
+/**
+ * Indicates what versions the resources have.
+ * @alias installInformations
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ * @example <caption>How to create a installInfo file.<br/>1. Create a javascript file in {plugin_name} folder and name it as manifest.js <br/>2. paste the source code below into the file.</caption>
+ * $jkfjs.installInfo = {
+ * 	name: 'fancybox',
+ * 	versions: ['2']
+ * };
+ */
+$w.$jkfjs.installInformations = {};
+
+/**
+ * Indicates what tasks are queued.
+ * @alias tasks
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+$w.$jkfjs.tasks = {};
+
+/**
+ * A serial number to prevent duplicated name of tasks.
+ * @alias task_count_
+ * @type {JKJS.Number}
+ * @memberof $jkfjs
+ */
+$w.$jkfjs.task_count_ = 0;
+
+/**
+ * {@link $jkfjs.complete} is true when the initialization of JKJS is completed(makes sure -jk-bundle, -jk-include, -jk-install...etc are loaded).
+ * @alias complete
+ * @type {JKJS.Boolean}
+ * @memberof $jkfjs
+ */
+$w.$jkfjs.complete = false;
+$w.$jkfjs.evtonloads = {};
+
+/**
+ * A setter to add a task in a queue.
+ * @alias task
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+Object.defineProperty($w.$jkfjs, "task", {
+	set: function(v){
+		this.tasks[v.name] = v;
+	}
+});
+
+/**
+ * A setter to add a bundle in app.
+ * @alias bundle
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+Object.defineProperty($w.$jkfjs, "bundle", {
+	set: function(v){
+		//this.bundles.push(v);
+		this.bundles[v.name] = v;
+		$w.JKSLF(v.path);
+	}
+});
+
+/**
+ * A setter to add a resource in app.
+ * @alias resource
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+Object.defineProperty($w.$jkfjs, "resource", {
+	set: function(v){
+		this.resources[v.name] = v;
+		$w.JKSLF(v.name+'/'+v.version+'/manifest.js');
+	}
+});
+
+/**
+ * A setter to add a installInfo in app.
+ * @alias installInfo
+ * @type {JKJS.Object}
+ * @memberof $jkfjs
+ */
+Object.defineProperty($w.$jkfjs, "installInfo", {
+	set: function(v){
+		this.installInformations[v.name] = v;
+		$w.JKSLF(v.name+'/manifest.js');
+	}
+});
+
+/**
+ * An end-client object to manipulate most fundamental concepts and functions.
+ * @class jkfjs
+ */
+$w.jkfjs = function(_onload, plugin_name){
+	/**
+	 * Fires a JKJS onload event immediately if {@link $jkfjs.complete} is true, or the event is queued and executed late.
+	 * @function jkfjs
+	 * @memberof window
+	 * @param {JKJS.Function} _onload
+	 */
+	if(plugin_name && JKEventCannon(plugin_name, _onload)){return;}
+	if($jkfjs.complete){
+		_onload.call(window, plugin_name);
+		return;
+	}
+	if(_onload){
+		if(plugin_name) $w.$jkfjs.evtnamerelease ? $w.$jkfjs.evtnamerelease.push([_onload, plugin_name]) : $w.$jkfjs.evtnamerelease = [[_onload, plugin_name]];
+		else $w.$jkfjs.eventrelease ? $w.$jkfjs.eventrelease.push([_onload, plugin_name]) : $w.$jkfjs.eventrelease = [[_onload, plugin_name]];
+	}
+};
+
+$w.JKEventCannon = function(plugin_name, refire){
+	if(plugin_name){
+		var plugin_index;
+
+		if(!$w.$jkfjs.evtnamerelease || (plugin_index = $w.$jkfjs.evtnamerelease.map(function(v){return v[1]}).indexOf(plugin_name)) < 0){
+			if(!$jkfjs.installedPlugins[plugin_name]) return false;
+			if(refire){
+				refire.call(window, plugin_name);
+				return true;
+			}//else $w.$jkfjs.evtnamerelease ? $w.$jkfjs.evtnamerelease.push([null, plugin_name]) : $w.$jkfjs.evtnamerelease = [[null, plugin_name]];
+			return;
+		}
+
+		var plugin = refire ? refire : $w.$jkfjs.evtnamerelease.splice(plugin_index, 1)[0][0];
+		plugin && plugin.call(window, plugin_name);
+		return true;
+	}
+
+	if(!$w.$jkfjs.eventrelease) return;
+	while((evt = $w.$jkfjs.eventrelease.splice(0, 1)).length){
+		evt[0][0].call(window);
+		//evt = null;
+	}
+}
+
+$w.JKSLF = function(identity){
+	setTimeout(function(){
+		var evt = $jkfjs.evtonloads[identity];
+		if(!evt) return;
+		evt = evt.splice(0, 1);
+		evt.length && evt[0].call($w, identity);
+		if($jkfjs.evtonloads[identity] < 1){
+			$jkfjs.evtonloads[identity] = null;
+			delete $jkfjs.evtonloads[identity];
+		}
+	}, 10);
+};
+
+if ($w.addEventListener) {
+	//$w.addEventListener('load', JKEventCannon, false);
+	$w.addEventListener('load', JKStartup, true);
+	//$w.addEventListener('DOMContentLoaded', JKStartup, true);
+} else if ($w.attachEvent) {
+	//$w.attachEvent('onload', JKEventCannon);
+	$w.attachEvent('onload', JKStartup);
+}
+
+/**
+ * Send a get request.
+ * @function get
+ * @memberof jkfjs
+ * @param {JKJS.String} url
+ * @param {JKJS.Boolean} async
+ * @example
+ * jkfjs.get('http://localhost/test.js').success(function(data){
+ *	alert(data.myName);
+ * }).fail(function(){
+ *	alert('fail');
+ * }).done(function(){
+ *	alert('always executed');
+ * }).response('json');
+ */
+$w.jkfjs.get = JKJS.net.get;
+
+/**
+ * Send a post request.
+ * @function post
+ * @memberof jkfjs
+ * @param {JKJS.String} url
+ * @param {JKJS.Object} post_param
+ * @param {JKJS.Boolean} async
+ */
+$w.jkfjs.post = JKJS.net.post;
+
+/**
+ * Loop throught an object and support manipulating tasks.
+ * @function foreach
+ * @memberof jkfjs
+ * @param {JKJS.Object} object
+ * @param {JKJS.Function} block
+ * @return {JKJS.Task} Returns a task object which can be tracked by {@link jkfjs.runTask}
+ */
+$w.jkfjs.foreach = function(a, v){
+	var count = 0;
+	for(var i in a){
+		if(i == 'indexOf' || i == 'map') break;
+		 count++;
+	}
+
+	var t = JKJS.Task.$new('for', count);
+	t.run = function(){
+		for(var i in a){
+			if(i == 'indexOf' || i == 'map') break;
+			v.call(window, a[i], t);
+		}
+
+		a = v = null;
+	};
+
+	return t;
+};
+
+/**
+ * Create a task object.
+ * @function addTask
+ * @memberof jkfjs
+ * @param {JKJS.String} name - an identity to the task.
+ * @param {JKJS.Number} count - indicates how many works to complete.
+ * @param {JKJS.Function} run - runnable function.
+ * @return {JKJS.Task} Returns a task object which can be tracked by {@link jkfjs.runTask}
+ */
+$w.jkfjs.addTask = function(name, count, run){
+	var t = JKJS.Task.$new(name, count);
+	t.run = run;
+	//run.call(this, t);
+
+	return t;
+};
+
+/**
+ * Execute a task.
+ * @function runTask
+ * @memberof jkfjs
+ * @param {JKJS.Task} task - an identity to the task.
+ * @param {JKJS.Function} done - callback when the task is completed.
+ */
+$w.jkfjs.runTask = function(task, done){
+	if(task.count == 0){
+		done.call(task);
+		return;
+	}
+
+	var task_name = task.name + $jkfjs.task_count_++;
+	task.name = task_name;
+	$w.$jkfjs.task = {
+		name: task_name,
+		done: 0,
+		count: task.count,
+		finish: done
+	};
+
+	task.run();
+};
+
+JKJS.message.define('jkfjs.cronjob', {'exp_time': JKJS.String, 'task': JKJS.Task});
+JKJS.message.define('jkfjs.cronjob', {'exp_time': JKJS.String, 'job': JKJS.Job});
+$w.jkfjs.cronjob = function(){
+	var params = JKJS.message.build('jkfjs.cronjob', arguments);
+	console.log(params);
+};
+
+JKJS.message.define('jkfjs.job', {'exp_time': JKJS.String, 'tasks': JKJS.Object});
+$w.jkfjs.job = function(){
+	var params = JKJS.message.build('jkfjs.job', arguments);
+	console.log(params);
+};
+
+/**
+ * A wrapper of {@link JKJS.load}.
+ * @function load
+ * @memberof jkfjs
+ * @param {JKJS.String} source_type - enum[script, css].
+ * @param {JKJS.String|JKJS.Object} source|sources - the url to the file.
+ * @param {JKJS.Function=} callback
+ */
+JKJS.message.define('jkfjs.load', {'source_type': JKJS.String, 'source': JKJS.String});
+JKJS.message.define('jkfjs.load', {'source_type': JKJS.String, 'sources': JKJS.Object});
+JKJS.message.define('jkfjs.load', {'source_type': JKJS.String, 'source': JKJS.String, 'callback': JKJS.Function});
+JKJS.message.define('jkfjs.load', {'source_type': JKJS.String, 'sources': JKJS.Object, 'callback': JKJS.Function});
+$w.jkfjs.load = function(){
+	var params = JKJS.message.build('jkfjs.load', arguments);
+	if(params.source){
+		JKJS.load(params.source_type, JKJS.Url.$new(params.source), function(){
+			$jkfjs.installedPlugins[params.source] = true;
+			JKEventCannon(params.source);
+			params.callback && params.callback.call(window);
+		});
+	}else if(params.sources){
+		jkfjs.runTask(jkfjs.foreach(params.sources, function(v, t){
+			JKJS.load(params.source_type, JKJS.Url.$new(v), function(){
+				t.done();
+				$jkfjs.installedPlugins[v] = true;
+				JKEventCannon(v);
+			});
+		}), function(){
+			params.callback && params.callback.call(window);
+		});
+	}
+};
+
+/**
+ * Loads a file's content into a html tag.
+ * @function include
+ * @memberof jkfjs
+ * @param {JKJS.Any} target - a html tag to contain the source text of the file.
+ * @param {JKJS.String} source - the url to the file.
+ * @param {JKJS.Function=} callback
+ */
+JKJS.message.define('jkfjs.include', {'target': JKJS.Any, 'source': JKJS.String});
+JKJS.message.define('jkfjs.include', {'target': JKJS.Any, 'source': JKJS.String, 'callback': JKJS.Function});
+$w.jkfjs.include = function(){
+	var params = JKJS.message.build('jkfjs.include', arguments);
+	if(!params.target || !params.source){
+		return;
+	}
+
+	jkfjs.get(params.source).success(function(data){
+		//$d.body.querySelectorAll(params.target)
+		if(params.target.length) params.target[0].innerHTML = data;
+		else params.target.innerHTML = data;
+		params.callback && params.callback.call(window);
+	}).fail(function(params, xhr){
+
+	}).done(function(params, xhr){
+
+	}).response('text');
+};
+
+/**
+ * Loads a file's content into a html tag.
+ * @function loadJsInclude
+ * @memberof jkfjs
+ * @param {JKJS.Task} task
+ */
+$w.jkfjs.loadJsInclude = function(task){
+	var include = $d.getElementById('jkjs').getAttribute('data-jk-include');
+	if(!include){
+		task.done();
+		return;
+	}
+
+	jkfjs.runTask(jkfjs.foreach(include.split(','), function(v, t){
+		JKJS.load('script', JKJS.Url.$new(v.trim(), true), function(s){
+			//jkfjs//console.log(s.text + ' loaded');
+			$jkfjs.installed[v.file] = true;
+			t.done();
+		});
+	}), function(){
+		task.done();
+	});
+};
+
+/**
+ * Loads a file's content into a html tag.
+ * @function loadInstall
+ * @memberof jkfjs
+ * @param {JKJS.Task} task
+ */
+$w.jkfjs.loadInstall = function(task){
+	var install = $d.getElementById('jkjs').getAttribute('data-jk-install');
+	if(!install){
+		task.done();
+		return;
+	};
+
+	jkfjs.runTask(jkfjs.foreach(install.split(','), function(v, t){
+		jkfjs.install(v.trim(), t);
+	}), function(){
+		task.done();
+	});
+};
+
+/**
+ * Loads a file's content into a html tag.
+ * @function loadBundle
+ * @memberof jkfjs
+ * @param {JKJS.Task} task
+ */
+$w.jkfjs.loadBundle = function(task){
+	var install = $d.getElementById('jkjs').getAttribute('data-jk-bundle');
+	if(!install){
+		task.done();
+		return;
+	};
+
+	jkfjs.runTask(jkfjs.foreach(install.split(','), function(v, t){
+		JKJS.load('script', JKJS.Url.$new(v.trim(), true), function(s){
+			//jkfjs//console.log(s.text + ' loaded');
+			//$jkfjs.installed[v.file] = true;
+			t.done();
+		});
+	}), function(){
+		jkfjs.runTask(jkfjs.foreach($jkfjs.bundles, function(v, t){
+			if(v.install){
+				jkfjs.runTask(jkfjs.foreach(v.install.split(','), function(v, t){
+					jkfjs.install(v.trim(), t);
+				}), function(){
+
+					jkfjs.runTask(jkfjs.addTask('install_script_css', 2, function(){
+						var t = this;
+
+						jkfjs.runTask(jkfjs.foreach(v.js, function(v, t){
+							if($jkfjs.installed[v.file]){
+								t.done();
+								return;
+							}
+
+							$jkfjs.installed[v.file] = true;
+							JKJS.load('script', JKJS.Url.$new(v.file, true), function(s){
+								//jkfjs//console.log(s.text + ' loaded');
+								t.done();
+							});
+						}), function(){
+							t.done();
+						});
+
+						jkfjs.runTask(jkfjs.foreach(v.css, function(v, t){
+							if($jkfjs.installed[v.file]){
+								t.done();
+								return;
+							}
+
+							$jkfjs.installed[v.file] = true;
+							JKJS.load('css', JKJS.Url.$new(v.file, true), function(s){
+								//jkfjs//console.log(s.text + ' loaded');
+								t.done();
+							}, v.media ? v.media : 'all');
+						}), function(){
+							t.done();
+						});
+					}), function(){
+						t.done();
+					});
+
+				});
+			}
+		}), function(){
+			task.done();
+		});
+
+	});
+};
+
+$w.jkfjs.loadForm = function(task){
+	task.done();
+};
+
+$w.jkfjs.loadView = function(task){
+	task.done();
+};
+
+//define function headers for jkfjs.install
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.Task} task
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'task': JKJS.Task});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.Url} source
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'source': JKJS.Url});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.Url} source
+ * @param {JKJS.String} version - indicates which version to the source
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'source': JKJS.Url, 'version': JKJS.String});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.Any} obj - write custom scripts inline
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'obj': JKJS.Any});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.String} version - indicates which version to install plugin
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'version': JKJS.String});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.String} version - indicates which version to install plugin
+ * @param {JKJS.String} demander - indicates who required the plugin
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'version': JKJS.String, 'demander': JKJS.String});
+
+/**
+ * Install plugins from repository.
+ * @function install
+ * @memberof jkfjs
+ * @param {JKJS.String} name - plugin name
+ * @param {JKJS.String} version - indicates which version to install plugin
+ * @param {JKJS.String} demander - indicates who required the plugin
+ * @param {JKJS.Task} task
+ */
+JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'version': JKJS.String, 'demander': JKJS.String, 'task': JKJS.Task});
+//JKJS.message.define('jkfjs.install', {'name': JKJS.String, 'task': JKJS.Task});
+$w.jkfjs.install = function(){
+	var params = JKJS.message.build('jkfjs.install', arguments);
+
+	if(params.source){
+		JKJS.load('script', params.source);
+	}else if(params.obj && JKJS.getType(params.obj) != JKJS.Task){
+		this[params.name] = params.obj;
+	}else{
+		var module_base_dir = $w.$jkfjs.lib_repo + params.name + '/';
+		JKJS.load('script', JKJS.Url.$new(module_base_dir + 'manifest.js', false), function(s){
+			//jkfjs//console.log(s.text + ' loaded');
+			if(params.version && $jkfjs.installInformations[params.name].versions.indexOf(params.version) == -1){
+				console.error(params.demander + ' requested ' + params.name + ' ' + params.version + ' but not found');
+				return;
+			}
+
+			var version = params.version ? params.version : $w.$jkfjs.installInformations[params.name].versions.pop();
+			var module_dir = module_base_dir.concat(version).concat('/');
+
+			JKJS.load('script', JKJS.Url.$new(module_dir + 'manifest.js', false), function(s){
+				//jkfjs//console.log(s.text + ' loaded');
+				var res = $w.$jkfjs.resources[params.name];
+				if(res.browsers && res.browsers[jkfjs.browser.text]){
+					if((function(exp){
+						if(exp.length < 3) return true;
+						var browser_ver = parseInt(jkfjs.browser.version.replace(/[^\d]/ig, ''));
+						var required_ver = parseInt(exp[2].replace(/[^\d]/ig, ''));
+						if(exp[1] == '>' && browser_ver > required_ver) return false;
+						else if(exp[1] == '>=' && browser_ver >= required_ver) return false;
+						else if(exp[1] == '<' && browser_ver < required_ver) return false;
+						else if(exp[1] == '<=' && browser_ver <= required_ver) return false;
+						else if((exp[1] == '==' || exp[1] == '=') && browser_ver == required_ver) return false;
+						else return true;
+					})(res.browsers[jkfjs.browser.text].match(/([><=]+)(\d+)/))){
+						params.task && params.task.done();
+						console.error(params.name + ' only supports ' + jkfjs.browser.text + res.browsers[jkfjs.browser.text]);
+						return;
+					}
+				}
+
+				var required = res.required;
+
+				if(required.js){
+					//dependencies
+					jkfjs.runTask(jkfjs.foreach(required.dependencies, function(v, t){
+						$w.jkfjs.install(v.resource, v.version, params.name, t);
+					}), function(){
+
+						jkfjs.runTask(jkfjs.addTask('install_script_css', 2, function(){
+							var t = this;
+
+							jkfjs.runTask(jkfjs.foreach(required.css, function(v, t){
+								if($jkfjs.installed[v.file]){
+									t.done();
+									return;
+								}
+
+								$jkfjs.installed[v.file] = true;
+								JKJS.load('css', JKJS.Url.$new((/^(http:|https:)?\/\//).test(v.file) ? v.file : module_dir + v.file, v.async==true), function(s){
+									//jkfjs//console.log(s.text + ' loaded');
+									//$jkfjs.installed[v.file] = true;
+									t.done();
+								}, v.media ? v.media : 'all');
+							}), function(){
+								t.done();
+							});
+
+							jkfjs.runTask(jkfjs.foreach(required.js, function(v, t){
+								if($jkfjs.installed[v.file]){
+									t.done();
+									return;
+								}
+
+								$jkfjs.installed[v.file] = true;
+								JKJS.load('script', JKJS.Url.$new((/^(http:|https:)?\/\//).test(v.file) ? v.file : module_dir + v.file, v.async==true), function(s){
+									//jkfjs//console.log(s.text + ' loaded');
+									//$jkfjs.installed[v.file] = true;
+									//console.log(s);
+									$jkfjs.installedPlugins[s] = true;
+									JKEventCannon(s);
+									t.done();
+								});
+
+							}), function(){
+								t.done();
+								$jkfjs.installedPlugins[res.name] = true;
+								JKEventCannon(res.name);
+							});
+
+						}), function(){
+							if(params.task) params.task.done();
+						});
+
+
+					});
+
+
+				}
+			});
+		});
+	}
+};
+
+jkfjs.install('browser', (new JKDefineClass('Browser', function(){
+/**
+ * Detects what the browser and its version are.
+ * @alias browser
+ * @memberof jkfjs
+ * @type {Browser}
+ * @example
+ * var client = jkfjs.browser.text + ', ' + jkfjs.browser.version;
+ * alert(client);
+ */
+	var self = this;
+	var ua = navigator.userAgent, tem,
+	M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+	if(/trident/i.test(M[1])){
+		tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+		self.text = 'msie';
+		self.version = (tem[1] || '');
+		return;
+	}else if(!($w.ActiveXObject) && "ActiveXObject" in window){
+		self.text = 'msie';
+		self.version = '11';
+		return;
+	}else if(/x64|x32/ig.test($w.navigator.userAgent)){
+		self.text = 'msie';
+		self.version = '12';
+		return;
+	}
+	if(M[1]=== 'Chrome'){
+		tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
+		if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
+	}
+	M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+	if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+	self.text = M[0].toLowerCase();
+	self.version = M[1];
+})).$new());
+
+jkfjs.install('array', (new JKDefineClass('Array', function(){
+	var self = this;
+	self.shuffle = function(a){
+		var j, x, i, a;
+		for (i = a.length; i; i -= 1) {
+			j = Math.floor(Math.random() * i);
+			x = a[i - 1];
+			a[i - 1] = a[j];
+			a[j] = x;
+		}
+		return a;
+	};
+})).$new());
+
+function JKStartup(){
+	var include = $d.body.querySelectorAll('[data-jk-include]');
+
+	jkfjs.runTask(jkfjs.foreach(include, function(v, t){
+		if(JKJS.getType(v) == JKJS.Number || JKJS.getType(v) == JKJS.Function){
+			t.done();
+			return;
+		}
+
+		jkfjs.get(v.getAttribute('data-jk-include')).success(function(data){
+			v.innerHTML = data;
+		}).fail(function(params, xhr){
+			//jkfjs//console.log(xhr);
+		}).done(function(params, xhr){
+			t.done();
+		}).response('text');
+	}), function(){
+		jkfjs.runTask(jkfjs.addTask('bundle_install', 2, function(){
+			var t = this;
+			jkfjs.loadInstall(t);
+			jkfjs.loadBundle(t);
+		}), function(){
+			jkfjs.runTask(jkfjs.addTask('load_js_view_form', 3, function(){
+				var t = this;
+				jkfjs.loadJsInclude(t);
+				jkfjs.loadForm(t);
+				jkfjs.loadView(t);
+			}), function(){
+				$jkfjs.complete = true;
+				JKEventCannon();
+			});
+
+		});
+	});
+}
+
+})(window, document, document.getElementsByTagName('head')[0]);
